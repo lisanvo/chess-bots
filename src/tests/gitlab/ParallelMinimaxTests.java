@@ -24,6 +24,7 @@ public class ParallelMinimaxTests extends SearcherTests {
 
         ALLOWED_TIME = 30000;
 	    
+
         test("depth2", TestingInputs.FENS_TO_TEST.length);
         test("depth3", TestingInputs.FENS_TO_TEST.length);
         test("depth4", TestingInputs.FENS_TO_TEST.length);
