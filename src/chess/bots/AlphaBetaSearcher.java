@@ -29,22 +29,31 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		} 
 		
 		BestMove<M> bestMove = new BestMove<M>(alpha);
+		int newAlpha = alpha;
     	for (M move : board.generateMoves()) {
     		board.applyMove(move);
-    		BestMove<M> current = alphabeta(evaluator, board, depth - 1, -beta, -alpha).negate();
+    		BestMove<M> current = alphabeta(evaluator, board, depth - 1, -beta, -newAlpha).negate();
     		board.undoMove();
     		
-    		// if value is between alpha and beta, we've found a new lower bound
-    		if (current.value > alpha) {
-    			bestMove = new BestMove<M>(move, current.value);
-    		}
+    		// if current value > the lower bound (alpha), update newAlpha because
+    		// newAlpha has to be maximized
+			if (current.value > alpha) {
+				newAlpha = current.value;
+			}
     		
-    		// if value is bigger than beta, we won't actually be able to get this move
-    		if (alpha >= beta) {
-    			bestMove = new BestMove<M>(move, alpha);
+    		// if current value >= the upper bound (beta), use beta because 
+			// the corresponding move is unreachable
+    		if (current.value >= beta) {
+    			bestMove = new BestMove<M>(beta);
     			return bestMove;
     		}
+    		
+    		// compare newAlpha and best value
+    		if (newAlpha > bestMove.value) {
+    			bestMove = new BestMove<M>(move, newAlpha);
+    		}
     	}
+    	
     	return bestMove;	
     }
 }

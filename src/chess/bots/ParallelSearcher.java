@@ -23,7 +23,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     }
 
     private BestMove<M> parallel(Evaluator<B> evaluator, B board, int cutoff) {
-    	return POOL.invoke(new ParallelTask(evaluator, board, cutoff, 0, board.generateMoves().size()));
+    	return POOL.invoke(new ParallelTask(evaluator, board, ply, 0, board.generateMoves().size()));
 	}
     
     private class ParallelTask extends RecursiveTask<BestMove<M>> {
@@ -54,42 +54,44 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		// Forking sequentially
     		if ((hi - lo) <= DIVIDE_CUTOFF) {
     			ArrayList<ParallelSearcher<M, B>.ParallelTask> tasks = new ArrayList<ParallelTask>();
-	    		BestMove<M> bestMove = new BestMove<M>(-evaluator.infty());		// initializes best move with negative infinity
+	    		BestMove<M> bestMove = new BestMove<M>(-evaluator.infty());
 	    		List<M> moves = board.generateMoves();
 	        	
 	    		// for each move, copy the b apply the move, add parallel task, fork parallel task
 	    		for (int i = lo; i < hi - 1; i++) {
 	    			B boardCopy = board.copy();
-	    			M move = moves.get(i + lo);
+	    			M move = boardCopy.generateMoves().get(i + lo);
 	        		boardCopy.applyMove(move);
-	        		moves = boardCopy.generateMoves();
 	        
-	        		ParallelTask task = new ParallelTask(evaluator, boardCopy, depth - 1, i + lo, moves.size());
+	        		ParallelTask task = new ParallelTask(evaluator, boardCopy, depth - 1, 0, boardCopy.generateMoves().size());
 	        		tasks.add(task);
 	        		task.fork();
 	        	}
 	    		
 	        	// Exits the for loop and evaluates the last move
 	    		B boardCopy = board.copy();
-	    		M move = moves.get(hi - 1);
+	    		M move = boardCopy.generateMoves().get(hi - 1);
 	    		boardCopy.applyMove(move);
-	    		moves = boardCopy.generateMoves();
 	        	
-        		ParallelTask task = new ParallelTask(evaluator, boardCopy, depth - 1, lo, moves.size());
-        		BestMove<M> current = task.compute().negate();		// computing current task will return the current best move
+        		ParallelTask task = new ParallelTask(evaluator, boardCopy, depth - 1, lo, boardCopy.generateMoves().size());
+        		BestMove<M> current = task.compute();		// computing current task will return the current best move
         			
         		if (current.value > bestMove.value) {
         			bestMove = new BestMove<M>(move, current.value);
         		}
         		
         		// finally, compare last move with each move associated with each parallel task
-        		for (int i = 0; i < tasks.size(); i++) {
-        			ParallelTask forkedTask = tasks.get(i);
-        			M joinMove = board.generateMoves().get(i + lo);
-        			BestMove<M> currentMove = forkedTask.join().negate();
+        		for (int i = lo; i < hi; i++) {
+        			boardCopy = board.copy();
+        			move = boardCopy.generateMoves().get(i + lo);
+        			boardCopy.applyMove(move);
+        			moves 
         			
-        			if (currentMove.value > bestMove.value) {
-        				bestMove = new BestMove<M>(joinMove, currentMove.value);
+        			task = new ParallelTask(evaluator, boardCopy, depth - 1, lo, boardCopy.generateMoves().size());
+        			current = task.join();
+        			
+        			if (current.value > bestMove.value) {
+        				bestMove = new BestMove<M>(move, current.value);
         			}
         		}        		
         		
@@ -101,14 +103,16 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	    		
 	    		left.fork();
 	    		
-	    		BestMove<M> rightResult = right.compute();			
-	    		BestMove<M> leftResult = left.join();
+	    		BestMove<M> leftResult = right.compute();			
+	    		BestMove<M> rightResult = left.join();
 	    
 	    				
-	    		if (leftResult.value > rightResult.value) {
+	    		if (leftResult != null) {
 	    			return leftResult;
-	    		} else {
+	    		} else if (rightResult != null) {
 	    			return rightResult;
+	    		} else {
+	    			return null;
 	    		}
     		}
 		}
