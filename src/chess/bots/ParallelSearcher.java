@@ -15,7 +15,7 @@ import chess.bots.SimpleSearcher;
 public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	private static final ForkJoinPool POOL = new ForkJoinPool();
-	private static final int DIVIDE_CUTOFF = 5;
+	private static final int DIVIDE_CUTOFF = 3;
 	
     public M getBestMove(B board, int myTime, int opTime) {
         BestMove<M> best = parallel(this.evaluator, board, cutoff);
@@ -23,22 +23,20 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     }
 
     private BestMove<M> parallel(Evaluator<B> evaluator, B board, int cutoff) {
-    	return POOL.invoke(new ParallelTask(evaluator, board, cutoff, null, 0, 0));
+    	return POOL.invoke(new ParallelTask(evaluator, board, cutoff, 0, board.generateMoves().size()));
 	}
     
     private class ParallelTask extends RecursiveTask<BestMove<M>> {
     	Evaluator<B> evaluator;
     	B board;
     	int depth;
-    	ParallelTask[] arr;
     	int lo;
     	int hi;
     	
-    	public ParallelTask(Evaluator<B> evaluator, B board, int depth, ParallelTask[] arr, int lo, int hi) {
+    	public ParallelTask(Evaluator<B> evaluator, B board, int depth, int lo, int hi) {
     		this.evaluator = evaluator;
     		this.board = board;
     		this.depth = depth;
-    		this.arr = arr;
     		this.lo = lo;
     		this.hi = hi;
     	}
@@ -49,69 +47,68 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		protected BestMove<M> compute() {
 			// If cutoff is reached, execute sequentially
     		if (depth == cutoff) {
-    			board = board.copy();
-    			return SimpleSearcher.minimax(evaluator, board, depth);
+    			B boardCopy = board.copy();
+    			return SimpleSearcher.minimax(evaluator, boardCopy, depth);
     		}
     		
     		// Forking sequentially
-    		if ((hi - lo) <= DIVIDE_CUTOFF) {    		    		
-    			ArrayList<ParallelSearcher<M, B>.ParallelTask> tasks = new ArrayList<ParallelTask>(); // list of tasks
+    		if ((hi - lo) <= DIVIDE_CUTOFF) {
+    			ArrayList<ParallelSearcher<M, B>.ParallelTask> tasks = new ArrayList<ParallelTask>();
 	    		BestMove<M> bestMove = new BestMove<M>(-evaluator.infty());		// initializes best move with negative infinity
-	    		List<M> moves = board.generateMoves();							// list of available moves
+	    		List<M> moves = board.generateMoves();
 	        	
 	    		// for each move, copy the b apply the move, add parallel task, fork parallel task
 	    		for (int i = lo; i < hi - 1; i++) {
-	        		this.board = board.copy();
-	        		M move = moves.get(i);
-	        		this.board.applyMove(move);
+	    			B boardCopy = board.copy();
+	    			M move = moves.get(i + lo);
+	        		boardCopy.applyMove(move);
+	        		moves = boardCopy.generateMoves();
 	        
-	        		ParallelTask task = new ParallelTask(evaluator, board, depth - 1, arr, 0, board.generateMoves().size());
+	        		ParallelTask task = new ParallelTask(evaluator, boardCopy, depth - 1, i + lo, moves.size());
 	        		tasks.add(task);
 	        		task.fork();
 	        	}
+	    		
 	        	// Exits the for loop and evaluates the last move
-	    		this.board = board.copy();
-	    		M move = moves.get(hi - 1);		// retrieves the last move
-	        	board.applyMove(move);
+	    		B boardCopy = board.copy();
+	    		M move = moves.get(hi - 1);
+	    		boardCopy.applyMove(move);
+	    		moves = boardCopy.generateMoves();
 	        	
-        		ParallelTask task = new ParallelTask(evaluator, board, depth - 1, arr, 0, board.generateMoves().size());
-        		BestMove<M> current = task.compute();		// computing current task will return the current best move
+        		ParallelTask task = new ParallelTask(evaluator, boardCopy, depth - 1, lo, moves.size());
+        		BestMove<M> current = task.compute().negate();		// computing current task will return the current best move
         			
         		if (current.value > bestMove.value) {
         			bestMove = new BestMove<M>(move, current.value);
         		}
         		
         		// finally, compare last move with each move associated with each parallel task
-        		for (int i = lo; lo < hi; i++) {
-        			this.board = board.copy();
-        			move = moves.get(i + lo);
-        			this.board.applyMove(move);
+        		for (int i = 0; i < tasks.size(); i++) {
+        			ParallelTask forkedTask = tasks.get(i);
+        			M joinMove = board.generateMoves().get(i + lo);
+        			BestMove<M> currentMove = forkedTask.join().negate();
         			
-        			task = new ParallelTask(evaluator, board, depth - 1, arr, 0, board.generateMoves().size());
-        			current = task.compute();
-        			
-        			if (current.value > bestMove.value) {
-        				bestMove = new BestMove<M>(move, current.value);
+        			if (currentMove.value > bestMove.value) {
+        				bestMove = new BestMove<M>(joinMove, currentMove.value);
         			}
         		}        		
         		
         		return bestMove;
 	        } else { 
     			// Forking via divide-and-conquer
-        		ParallelTask left = new ParallelTask(evaluator, board, depth - 1, arr, lo, (lo + hi) / 2);
-	    		ParallelTask right = new ParallelTask(evaluator, board, depth - 1, arr, lo + (hi - lo) / 2, hi);
+        		ParallelTask left = new ParallelTask(evaluator, board, depth, lo, lo + (hi - lo) / 2);
+	    		ParallelTask right = new ParallelTask(evaluator, board, depth, lo + (hi - lo) / 2, hi);
 	    		
 	    		left.fork();
 	    		
-	    		BestMove<M> leftResult = right.compute();
-	    		BestMove<M> rightResult = left.join();
+	    		BestMove<M> rightResult = right.compute();			
+	    		BestMove<M> leftResult = left.join();
+	    
 	    				
-	    		if (leftResult != null) {
+	    		if (leftResult.value > rightResult.value) {
 	    			return leftResult;
-	    		} else if (rightResult != null) {
-	    			return rightResult;
 	    		} else {
-	    			return null;
+	    			return rightResult;
 	    		}
     		}
 		}
