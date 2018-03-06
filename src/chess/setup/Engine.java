@@ -7,7 +7,9 @@ import cse332.chess.server.Hub;
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
 import chess.bots.AlphaBetaSearcher;
+import chess.bots.JamboreeSearcher;
 import chess.bots.LazySearcher;
+import chess.bots.SimpleSearcher;
 import chess.game.SimpleEvaluator;
 import chess.game.SimpleTimer;
 
@@ -22,7 +24,7 @@ public class Engine {
 	 */
 	
 	private Searcher <ArrayMove, ArrayBoard>
-	    searcher = new AlphaBetaSearcher<ArrayMove,ArrayBoard>();
+	    searcher = new JamboreeSearcher<ArrayMove,ArrayBoard>();
 	
 	public Engine(int time, int inc) {
         searcher.setDepth(3);
