@@ -11,9 +11,9 @@ import cse332.chess.server.Hub;
  */
 public class CloudClient {
     public static void main(String[] args) {
-        String username = "YOUR_TEAMNAME_HERE";
-        String password = "YOUR_TEAM_PASSWORD_HERE";
-        String botToPlay = "THE_BOT_YOU_WANT_TO_FACE";
+        String username = "punchout";
+        String password = "DNWPxfxkM9";
+        String botToPlay = "clamps";
 
         System.out.println("Starting a match against " + botToPlay);
         Hub hub = new Hub(null, botToPlay);

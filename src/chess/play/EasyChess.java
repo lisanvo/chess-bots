@@ -96,8 +96,8 @@ public class EasyChess extends JFrame {
 
     private class MyHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            String u1 = text.getText();
-            String p1 = new String(password.getPassword());
+            String u1 = "punchout";   // text.getText();
+            String p1 = "DNWPxfxkM9"; // new String(password.getPassword());
 
             buttonConnect.setEnabled(false);
             hub.login(u1, p1);

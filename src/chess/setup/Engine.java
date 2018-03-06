@@ -6,6 +6,7 @@ import cse332.chess.interfaces.Searcher;
 import cse332.chess.server.Hub;
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
+import chess.bots.AlphaBetaSearcher;
 import chess.bots.LazySearcher;
 import chess.game.SimpleEvaluator;
 import chess.game.SimpleTimer;
@@ -21,11 +22,11 @@ public class Engine {
 	 */
 	
 	private Searcher <ArrayMove, ArrayBoard>
-	    searcher = new LazySearcher<ArrayMove,ArrayBoard>();
+	    searcher = new AlphaBetaSearcher<ArrayMove,ArrayBoard>();
 	
 	public Engine(int time, int inc) {
-        searcher.setDepth(2);
-        searcher.setCutoff(0);
+        searcher.setDepth(3);
+        searcher.setCutoff(2);
 
         searcher.setEvaluator(new SimpleEvaluator());
         searcher.setTimer(new SimpleTimer(time, inc));
