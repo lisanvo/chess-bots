@@ -62,8 +62,12 @@ AbstractSearcher<M, B> {
 			if (move != null) {
 				board = board.copy();
 				board.applyMove(move);
-				moves = board.generateMoves();
-				hi = moves.size();
+				//moves = board.generateMoves();
+				//hi = moves.size();
+		 		if (depth > cutoff && !moves.isEmpty()){
+        			moves = board.generateMoves();
+        			hi = moves.size();
+        		}
 			}
 			if (moves.isEmpty()) {
 				return new BestMove<M>(board.inCheck() ? -evaluator.mate() - depth : -evaluator.stalemate());
