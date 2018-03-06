@@ -2,16 +2,13 @@ package chess.setup;
 
 import java.util.Observer;
 
-import cse332.chess.interfaces.Searcher;
-import cse332.chess.server.Hub;
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
-import chess.bots.AlphaBetaSearcher;
-import chess.bots.JamboreeSearcher;
-import chess.bots.LazySearcher;
-import chess.bots.SimpleSearcher;
+import chess.bots.BetterJamboree;
 import chess.game.SimpleEvaluator;
 import chess.game.SimpleTimer;
+import cse332.chess.interfaces.Searcher;
+import cse332.chess.server.Hub;
 
 /**
  *  When you play on the chess server, this class is used to set up
@@ -24,7 +21,7 @@ public class Engine {
 	 */
 	
 	private Searcher <ArrayMove, ArrayBoard>
-	    searcher = new JamboreeSearcher<ArrayMove,ArrayBoard>();
+	    searcher = new BetterJamboree<ArrayMove,ArrayBoard>();
 	
 	public Engine(int time, int inc) {
         searcher.setDepth(5);
