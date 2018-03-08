@@ -2,6 +2,7 @@ package tests;
 
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
+import chess.bots.JamboreeSearcher;
 import chess.bots.LazySearcher;
 import chess.bots.ParallelSearcher;
 import chess.bots.SimpleSearcher;
@@ -25,7 +26,7 @@ public class TestStartingPosition {
         System.out.println(botName + " returned " + getBestMove(fen, searcher, depth, cutoff));
     }
     public static void main(String[] args) {
-        Searcher<ArrayMove, ArrayBoard> dumb = new ParallelSearcher<>();
+        Searcher<ArrayMove, ArrayBoard> dumb = new JamboreeSearcher<>();
         printMove(STARTING_POSITION, dumb, 3, 0);
     }
 }

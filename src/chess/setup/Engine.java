@@ -5,6 +5,8 @@ import java.util.Observer;
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
 import chess.bots.BetterJamboree;
+import chess.bots.AlphaBetaSearcher;
+import chess.bots.JamboreeSearcher;
 import chess.game.SimpleEvaluator;
 import chess.game.SimpleTimer;
 import cse332.chess.interfaces.Searcher;
@@ -21,7 +23,7 @@ public class Engine {
 	 */
 	
 	private Searcher <ArrayMove, ArrayBoard>
-	    searcher = new BetterJamboree<ArrayMove,ArrayBoard>();
+	    searcher = new JamboreeSearcher<ArrayMove,ArrayBoard>();
 	
 	public Engine(int time, int inc) {
         searcher.setDepth(5);
