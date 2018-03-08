@@ -28,13 +28,13 @@ public class CutoffTests {
 			long jamStart = 0;
 			long jamStop = 0;
 			
-			paraStart = System.currentTimeMillis();
+			paraStart = System.nanoTime();
 			run(parallel, fens[fenIndex], cutoffs[cutoffIndex]);
-			paraStop = System.currentTimeMillis();
+			paraStop = System.nanoTime();
 			
-			jamStart = System.currentTimeMillis();
+			jamStart = System.nanoTime();
 			run(jamboree, fens[fenIndex], cutoffs[cutoffIndex]);
-			jamStop = System.currentTimeMillis();
+			jamStop = System.nanoTime();
 			
 			paraRuntimes[i] = paraStop - paraStart;
 			jamRuntimes[i] = jamStop - jamStart;
@@ -48,9 +48,9 @@ public class CutoffTests {
 			jamAverage += jamRuntimes[j];
 		}
 		
-		System.out.println("FEN_INDEX: " + fenIndex + "| CUTOFF_INDEX: " + cutoffIndex);
+		System.out.println("FEN_INDEX: " + fenIndex + " | CUTOFF_INDEX: " + cutoffIndex);
 		System.out.println("Parallel: " + (paraAverage /= TRIALS));
-		System.out.println("Parallel: " + (jamAverage /= TRIALS));
+		System.out.println("Jamboree: " + (jamAverage /= TRIALS));
 	}
 	
 	public static void run(Searcher<ArrayMove, ArrayBoard> bot, String fen, int cutoff) {
