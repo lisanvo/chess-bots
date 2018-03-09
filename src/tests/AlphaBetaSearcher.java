@@ -8,7 +8,7 @@ import cse332.chess.interfaces.Move;
 
 public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
 	public static Integer COUNTER = 0;
-	
+
 	public M getBestMove(B board, int myTime, int opTime) {
 		BestMove<M> best = alphabeta(this.evaluator, board, ply, -evaluator.infty(), evaluator.infty());
 		return best.move;
@@ -31,11 +31,11 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
 
 		BestMove<M> bestMove = new BestMove<M>(alpha);
 		int newAlpha = alpha;
+		COUNTER++;
+
 		for (M move : board.generateMoves()) {
 			board.applyMove(move);
-			synchronized(COUNTER) {
-				COUNTER++;
-			}
+
 			BestMove<M> current = alphabeta(evaluator, board, depth - 1, -beta, -newAlpha).negate();
 			board.undoMove();
 

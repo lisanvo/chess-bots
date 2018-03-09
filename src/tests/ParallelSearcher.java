@@ -6,7 +6,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 import chess.bots.BestMove;
-import chess.bots.SimpleSearcher;
 import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
 import cse332.chess.interfaces.Evaluator;
@@ -52,14 +51,14 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		// when DIVIDE_CUTOFF is reached, switch from divide-and-conquer to forking sequentially
 		@Override
 		protected BestMove<M> compute() {
-			// If cutoff is reached, execute sequentially
+
 			if (move != null) {
+
+				board = board.copy();
+				board.applyMove(move);
 				synchronized(COUNTER) {
 					COUNTER++;
 				}
-				board = board.copy();
-				board.applyMove(move);
-				
 				moves = board.generateMoves();
 				hi = moves.size();
 			}

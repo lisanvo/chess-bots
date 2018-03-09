@@ -2,16 +2,12 @@ package tests;
 
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
-import chess.bots.JamboreeSearcher;
-import chess.bots.LazySearcher;
-import chess.bots.ParallelSearcher;
-import chess.bots.SimpleSearcher;
 import chess.game.SimpleEvaluator;
-import cse332.chess.interfaces.Move;
 import cse332.chess.interfaces.Searcher;
 
 public class TestStartingPosition {
-    public static final String STARTING_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    public static String STARTING_POSITION = "2kr2r1/p6p/2n5/3pp3/1pp5/2qPPQ2/P1P4P/R1R2K2 b Hh -" + 
+    		" 0 1";
 
     public static ArrayMove getBestMove(String fen, Searcher<ArrayMove, ArrayBoard> searcher, int depth, int cutoff) { 
         searcher.setDepth(depth);

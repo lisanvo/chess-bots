@@ -1,8 +1,6 @@
 package tests;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -61,6 +59,7 @@ AbstractSearcher<M, B> {
 		// when DIVIDE_CUTOFF is reached, switch from divide-and-conquer to forking sequentially
 		@Override
 		protected BestMove<M> compute() {
+
 			if (move != null) {
 				board = board.copy();
 				board.applyMove(move);
@@ -77,21 +76,6 @@ AbstractSearcher<M, B> {
 			if (depth <= cutoff) {
 				return AlphaBetaSearcher.alphabeta(evaluator, board, depth, alpha, beta);
 			}
-			
-			if (best == null) {
-				Collections.sort(moves, new Comparator<M>() {
-					@Override
-					public int compare(M one, M two) {
-						board.applyMove(one);
-						int x = evaluator.eval(board);
-						board.undoMove();
-						board.applyMove(two);
-						int y = evaluator.eval(board);
-						board.undoMove();
-						return Integer.signum(x - y);
-					}
-				});
-			}
 			//fork sequentially
 			if (sequential) {
 				lo = (int) (PERC_SEQ * hi);
@@ -99,9 +83,6 @@ AbstractSearcher<M, B> {
 				for (int i = 0; i < lo; i++) {
 					M move2 = moves.get(i);
 					board.applyMove(move2);
-					synchronized(COUNTER) {
-						COUNTER++;
-					}
 					List<M> moves2 = board.generateMoves();
 					int value = new JamboreeTask(true, evaluator, board, moves2, cutoff, null, depth - 1, 0, moves2.size(), -beta, -alpha, null).compute().negate().value;
 					board.undoMove();
