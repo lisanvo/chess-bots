@@ -62,8 +62,6 @@ the experiment, do the following:
    implementations).  Make a pretty graph of your results (link to it from
    here) and fill in the table here as well:
 
-<pre>TODO: Fill in the table below</pre>
-
 
 |      Algorithm     | 1-ply | 2-ply |  3-ply |  4-ply |   5-ply   |
 | :----------------: |:-----:|:-----:|:------:|:------:|:---------:|
