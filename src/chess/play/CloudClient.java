@@ -13,7 +13,7 @@ public class CloudClient {
     public static void main(String[] args) {
         String username = "punchout";
         String password = "DNWPxfxkM9";
-        String botToPlay = "ParallelSearcher";
+        String botToPlay = "JamboreeSearcher";
 
         System.out.println("Starting a match against " + botToPlay);
         Hub hub = new Hub(null, botToPlay);

@@ -12,8 +12,12 @@ import cse332.chess.interfaces.Move;
 
 public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		AbstractSearcher<M, B> {
-	private static final ForkJoinPool POOL = new ForkJoinPool();
+	private static ForkJoinPool POOL = new ForkJoinPool();
 	private static final int DIVIDE_CUTOFF = 3;
+	
+	public void setProcessors(int k) {
+	    POOL = new ForkJoinPool(k);
+    }
 
 	public M getBestMove(B board, int myTime, int opTime) {
 		BestMove<M> best = parallel(this.evaluator, board, cutoff);

@@ -99,7 +99,7 @@ public class EasyChess extends JFrame {
             String u1 = "punchout";   // text.getText();
             String p1 = "DNWPxfxkM9"; // new String(password.getPassword());
 
-            buttonConnect.setEnabled(false);
+            buttonConnect.setEnabled(true);
             hub.login(u1, p1);
         }
     }
