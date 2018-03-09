@@ -24,39 +24,53 @@ public class ProcessorTests {
 		long[] paraRuntimes = new long[TRIALS];
 		long[] jamRuntimes = new long[TRIALS];
 		
-		// loop by number of processors
-		for (int k = 0; k < processors.length; k++) {
-			System.out.println(processors[k]);
-			parallel.setProcessors(processors[k]);
-			jamboree.setProcessors(processors[k]);
+		// loop for parallel searcher
+		for (int k = 28; k <= 32; k++) {
+			System.out.println(k + " processors");
+			parallel.setProcessors(k);
 			// loop by number of trials
 			for (int i = 0; i < TRIALS; i++) {
 				long paraStart = 0;
 				long paraStop = 0;
-				long jamStart = 0;
-				long jamStop = 0;
 				
 				paraStart = System.nanoTime();
 				run(parallel, fens[fenIndex], 2);
 				paraStop = System.nanoTime();
 				
+				paraRuntimes[i] = paraStop - paraStart;
+			}
+			long paraAverage = 0;
+			
+			for (int j = 0; j < TRIALS; j++) {
+				paraAverage += paraRuntimes[j];
+			}
+			
+			System.out.println("FEN_INDEX: " + fenIndex);
+			System.out.println("Parallel: " + (paraAverage /= TRIALS));
+		}
+		
+		// loop for jamboree searcher
+		for (int k = 24; k <= 28; k++) {
+			System.out.println(k + " processors");
+			jamboree.setProcessors(processors[k]);
+			// loop by number of trials
+			for (int i = 0; i < TRIALS; i++) {
+				long jamStart = 0;
+				long jamStop = 0;
+				
 				jamStart = System.nanoTime();
 				run(jamboree, fens[fenIndex], 2);
 				jamStop = System.nanoTime();
 				
-				paraRuntimes[i] = paraStop - paraStart;
 				jamRuntimes[i] = jamStop - jamStart;
 			}
-			long paraAverage = 0;
 			long jamAverage = 0;
 			
 			for (int j = 0; j < TRIALS; j++) {
-				paraAverage += paraRuntimes[j];
 				jamAverage += jamRuntimes[j];
 			}
 			
-			System.out.println("FEN_INDEX: " + fenIndex + " | CUTOFF = 2");
-			System.out.println("Parallel: " + (paraAverage /= TRIALS));
+			System.out.println("FEN_INDEX: " + fenIndex);
 			System.out.println("Jamboree: " + (jamAverage /= TRIALS));
 		}
 	}
