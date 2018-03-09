@@ -52,7 +52,7 @@ public class ProcessorTests {
 		// loop for jamboree searcher
 		for (int k = 24; k <= 28; k++) {
 			System.out.println(k + " processors");
-			jamboree.setProcessors(processors[k]);
+			jamboree.setProcessors(k);
 			// loop by number of trials
 			for (int i = 0; i < TRIALS; i++) {
 				long jamStart = 0;
