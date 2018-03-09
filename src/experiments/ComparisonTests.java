@@ -5,11 +5,15 @@ import chess.board.ArrayMove;
 import chess.game.SimpleEvaluator;
 import chess.game.SimpleTimer;
 import cse332.chess.interfaces.Searcher;
-import experiments.JamboreeSearcher;
+import experiments.SimpleSearcher;
+import experiments.AlphaBetaSearcher;
 import experiments.ParallelSearcher;
+import experiments.JamboreeSearcher;
 
 public class ComparisonTests {
-	private static final int[] processors = {1, 8, 16, 24, 32};
+	private static final int[][] processors = {{0, 0},  // start board
+											   {0, 0},  // middle board
+											   {0, 0}}; // end board
 	private static final int[][] cutoffs = {{3, 2},  	// start board
 											{2, 1},		// middle board
 											{2, 1}};	// end board
@@ -19,6 +23,8 @@ public class ComparisonTests {
 	private static final int TRIALS = 20;
 	
 	public static void test(int fenIndex, int cutoffIndex) {
+		SimpleSearcher<ArrayMove, ArrayBoard> simple = new SimpleSearcher<ArrayMove, ArrayBoard>();
+		AlphaBetaSearcher<ArrayMove, ArrayBoard> ab = new AlphaBetaSearcher<ArrayMove, ArrayBoard>();
 		ParallelSearcher<ArrayMove, ArrayBoard> parallel = new ParallelSearcher<ArrayMove, ArrayBoard>();
 		JamboreeSearcher<ArrayMove, ArrayBoard> jamboree = new JamboreeSearcher<ArrayMove, ArrayBoard>();
 		long[] paraRuntimes = new long[TRIALS];

@@ -37,11 +37,11 @@ public class ProcessorTests {
 				long jamStop = 0;
 				
 				paraStart = System.nanoTime();
-				run(parallel, fens[fenIndex], cutoffs[cutoffIndex][cutoffIndex]);
+				run(parallel, fens[fenIndex], cutoffs[cutoffIndex][0]);
 				paraStop = System.nanoTime();
 				
 				jamStart = System.nanoTime();
-				run(jamboree, fens[fenIndex], cutoffs[cutoffIndex][cutoffIndex + 1]);
+				run(jamboree, fens[fenIndex], cutoffs[cutoffIndex][1]);
 				jamStop = System.nanoTime();
 				
 				paraRuntimes[i] = paraStop - paraStart;
@@ -73,16 +73,13 @@ public class ProcessorTests {
 		test(0, 0);
 		test(0, 1);
 		test(0, 2);
-		test(0, 3);
 		// Middle fen tested with each cutoff
 		test(1, 0);
 		test(1, 1);
 		test(1, 2);
-		test(1, 3);
 		// End state tested with each cutoff
 		test(2, 0);
 		test(2, 1);
 		test(2, 2);
-		test(2, 3);
 	}
 }
