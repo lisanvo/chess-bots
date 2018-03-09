@@ -9,7 +9,7 @@ import experiments.JamboreeSearcher;
 import experiments.ParallelSearcher;
 
 public class ProcessorTests {
-	private static final int[] processors = {1, 8, 16, 24, 32};
+	private static final int[] processors = {16, 24, 32};
 	private static final int[][] cutoffs = {{3, 2},  	// start board
 											{2, 1},		// middle board
 											{2, 1}};	// end board
