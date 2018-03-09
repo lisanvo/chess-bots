@@ -22,48 +22,65 @@ public class ComparisonTests {
 										"2k3r1/p6p/2n5/3pp3/1pp1P3/2qP4/P1P1K2P/R1R5 b Hh -"};
 	private static final int TRIALS = 20;
 	
-	public static void test(int fenIndex, int cutoffIndex) {
+	public static void test(int fenIndex, int cutoffIndex, int processorIndex) {
 		SimpleSearcher<ArrayMove, ArrayBoard> simple = new SimpleSearcher<ArrayMove, ArrayBoard>();
 		AlphaBetaSearcher<ArrayMove, ArrayBoard> ab = new AlphaBetaSearcher<ArrayMove, ArrayBoard>();
 		ParallelSearcher<ArrayMove, ArrayBoard> parallel = new ParallelSearcher<ArrayMove, ArrayBoard>();
 		JamboreeSearcher<ArrayMove, ArrayBoard> jamboree = new JamboreeSearcher<ArrayMove, ArrayBoard>();
+		long[] simRuntimes = new long[TRIALS];
+		long[] abRuntimes = new long[TRIALS];
 		long[] paraRuntimes = new long[TRIALS];
 		long[] jamRuntimes = new long[TRIALS];
 		
-		// loop by number of processors
-		for (int k = 0; k < processors.length; k++) {
-			System.out.println(processors[k]);
-			parallel.setProcessors(processors[k]);
-			jamboree.setProcessors(processors[k]);
-			// loop by number of trials
-			for (int i = 0; i < TRIALS; i++) {
-				long paraStart = 0;
-				long paraStop = 0;
-				long jamStart = 0;
-				long jamStop = 0;
-				
-				paraStart = System.nanoTime();
-				run(parallel, fens[fenIndex], cutoffs[cutoffIndex][cutoffIndex]);
-				paraStop = System.nanoTime();
-				
-				jamStart = System.nanoTime();
-				run(jamboree, fens[fenIndex], cutoffs[cutoffIndex][cutoffIndex + 1]);
-				jamStop = System.nanoTime();
-				
-				paraRuntimes[i] = paraStop - paraStart;
-				jamRuntimes[i] = jamStop - jamStart;
-			}
+		// loop by number of trials
+		for (int i = 0; i < TRIALS; i++) {
+			parallel.setProcessors(processors[processorIndex][0]);
+			jamboree.setProcessors(processors[processorIndex][1]);
+			
+			long simStart = 0;
+			long simStop = 0;
+			long abStart = 0;
+			long abStop = 0;
+			long paraStart = 0;
+			long paraStop = 0;
+			long jamStart = 0;
+			long jamStop = 0;
+			
+			simStart = System.nanoTime();
+			run(simple, fens[fenIndex], cutoffs[cutoffIndex][cutoffIndex]);
+			simStop = System.nanoTime();
+			
+			abStart = System.nanoTime();
+			run(ab, fens[fenIndex], cutoffs[cutoffIndex][cutoffIndex]);
+			abStop = System.nanoTime();
+			
+			paraStart = System.nanoTime();
+			run(parallel, fens[fenIndex], cutoffs[cutoffIndex][0]);
+			paraStop = System.nanoTime();
+			
+			jamStart = System.nanoTime();
+			run(jamboree, fens[fenIndex], cutoffs[cutoffIndex][1]);
+			jamStop = System.nanoTime();
+			
+			paraRuntimes[i] = paraStop - paraStart;
+			jamRuntimes[i] = jamStop - jamStart;
 		}
 		
+		long simAverage = 0;
+		long abAverage = 0;
 		long paraAverage = 0;
 		long jamAverage = 0;
 		
 		for (int j = 0; j < TRIALS; j++) {
+			simAverage += simRuntimes[j];
+			abAverage += abRuntimes[j];
 			paraAverage += paraRuntimes[j];
 			jamAverage += jamRuntimes[j];
 		}
 		
 		System.out.println("FEN_INDEX: " + fenIndex + " | CUTOFF_INDEX: " + cutoffIndex);
+		System.out.println("Simple: " + (simAverage /= TRIALS));
+		System.out.println("AlphaBeta: " + (abAverage /= TRIALS));
 		System.out.println("Parallel: " + (paraAverage /= TRIALS));
 		System.out.println("Jamboree: " + (jamAverage /= TRIALS));
 	}
@@ -77,19 +94,19 @@ public class ComparisonTests {
 
 	public static void main(String[] args) {	
 		// Beginning fen tested with each cutoff
-		test(0, 0);
-		test(0, 1);
-		test(0, 2);
-		test(0, 3);
+		test(0, 0, 0);
+		test(0, 1, 1);
+		test(0, 2, 2);
+		test(0, 3, 3);
 		// Middle fen tested with each cutoff
-		test(1, 0);
-		test(1, 1);
-		test(1, 2);
-		test(1, 3);
+		test(1, 0, 0);
+		test(1, 1, 1);
+		test(1, 2, 2);
+		test(1, 3, 3);
 		// End state tested with each cutoff
-		test(2, 0);
-		test(2, 1);
-		test(2, 2);
-		test(2, 3);
+		test(2, 0, 0);
+		test(2, 1, 1);
+		test(2, 2, 2);
+		test(2, 3, 3);
 	}
 }
