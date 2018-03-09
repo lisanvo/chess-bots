@@ -8,7 +8,7 @@ import cse332.chess.interfaces.Searcher;
 import experiments.JamboreeSearcher;
 import experiments.ParallelSearcher;
 
-public class ProcessorTests {
+public class ComparisonTests {
 	private static final int[] processors = {1, 8, 16, 24, 32};
 	private static final int[][] cutoffs = {{3, 2},  	// start board
 											{2, 1},		// middle board
@@ -47,18 +47,19 @@ public class ProcessorTests {
 				paraRuntimes[i] = paraStop - paraStart;
 				jamRuntimes[i] = jamStop - jamStart;
 			}
-			long paraAverage = 0;
-			long jamAverage = 0;
-			
-			for (int j = 0; j < TRIALS; j++) {
-				paraAverage += paraRuntimes[j];
-				jamAverage += jamRuntimes[j];
-			}
-			
-			System.out.println("FEN_INDEX: " + fenIndex + " | CUTOFF_INDEX: " + cutoffIndex);
-			System.out.println("Parallel: " + (paraAverage /= TRIALS));
-			System.out.println("Jamboree: " + (jamAverage /= TRIALS));
 		}
+		
+		long paraAverage = 0;
+		long jamAverage = 0;
+		
+		for (int j = 0; j < TRIALS; j++) {
+			paraAverage += paraRuntimes[j];
+			jamAverage += jamRuntimes[j];
+		}
+		
+		System.out.println("FEN_INDEX: " + fenIndex + " | CUTOFF_INDEX: " + cutoffIndex);
+		System.out.println("Parallel: " + (paraAverage /= TRIALS));
+		System.out.println("Jamboree: " + (jamAverage /= TRIALS));
 	}
 	
 	public static void run(Searcher<ArrayMove, ArrayBoard> bot, String fen, int cutoff) {
